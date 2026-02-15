@@ -28,7 +28,7 @@ class GameRepository {
             val errorAleatorio = (1..5).random()
 
             if (errorAleatorio == 1) {
-                Result.failure(Exception("Servidor ocupado"))
+                Result.failure(Exception("Error de red"))
             } else {
                 val disponibles = listaJuegos.filter { it !in listaVista }
                 val elementoAleatorio = disponibles.random()
@@ -36,8 +36,5 @@ class GameRepository {
                 Result.success(elementoAleatorio)
             }
         }
-
-
-
     }
 }
