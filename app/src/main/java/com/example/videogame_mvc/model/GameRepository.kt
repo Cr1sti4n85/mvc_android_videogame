@@ -37,4 +37,6 @@ class GameRepository {
             }
         }
     }
+
+    open fun obtenerTodos(): List<Videogame> = listaJuegos.toList()
 }
