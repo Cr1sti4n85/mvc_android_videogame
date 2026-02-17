@@ -19,7 +19,7 @@ class GameRepository {
 
     suspend fun getRandomGame(): Result<Videogame>{
         return withContext(Dispatchers.IO){
-            val delayAleatorio = (2000..4500).random().toLong()
+            val delayAleatorio = (1000..5000).random().toLong()
             delay(delayAleatorio)
             if (listaVista.size == listaJuegos.size) {
                 listaVista.clear()
@@ -39,4 +39,5 @@ class GameRepository {
     }
 
     open fun obtenerTodos(): List<Videogame> = listaJuegos.toList()
+
 }

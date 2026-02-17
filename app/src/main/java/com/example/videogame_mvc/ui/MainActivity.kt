@@ -2,6 +2,7 @@ package com.example.videogame_mvc
 
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -38,7 +39,7 @@ class MainActivity : AppCompatActivity() {
         setupObservers()
         setupListeners()
 
-        viewModel.obtenerVideojuegos()
+//        viewModel.obtenerVideojuegos()
     }
 
     /*private fun setupListener() {
@@ -138,15 +139,24 @@ class MainActivity : AppCompatActivity() {
             binding.ivImagenJuego.setImageResource(videojuego.imagen)
         }
 
-        viewModel.estaCargando.observe(this) {cargando ->
-            binding.circularProgressIndicator.visibility = if (cargando) View.VISIBLE else View.GONE
+        viewModel.juegoEstaCargando.observe(this) {cargando ->
+            binding.progressBarHorizontal.visibility = if (cargando) View.VISIBLE else View.GONE
             binding.btnJuegoSiguiente.isEnabled = !cargando
+        }
+
+        viewModel.juegosCargando.observe(this) { cargando ->
+            binding.circularProgress.visibility = if (cargando) View.VISIBLE else View.GONE
             binding.btnTresJuegos.isEnabled = !cargando
         }
 
         viewModel.mensajeEstado.observe(this){mensaje ->
             binding.tvEstado.text = mensaje
         }
+
+        viewModel.progreso.observe(this) { progreso ->
+            binding.progressBarHorizontal.progress = progreso
+        }
+
     }
 
     private fun setupListeners(){
@@ -169,6 +179,7 @@ class MainActivity : AppCompatActivity() {
         binding.tvLanzamiento.text = ""
         binding.ivImagenJuego.setImageDrawable(null)
         binding.ivImagenJuego.visibility = View.GONE
+        viewModel.borrarListaJuegos()
     }
 
 }

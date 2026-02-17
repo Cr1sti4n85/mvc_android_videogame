@@ -1,6 +1,9 @@
 package com.example.videogame_mvc.ui.viewmodel
 
+import android.graphics.Color
 import android.provider.MediaStore
+import android.util.Log
+import androidx.core.graphics.toColorInt
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,6 +13,8 @@ import com.example.videogame_mvc.model.Videogame
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 
@@ -23,11 +28,18 @@ class TaskViewModel: ViewModel() {
     private val _singleGame = MutableLiveData<Videogame>()
     val singleGame: LiveData<Videogame> get() = _singleGame
 
-    private val _estaCargando = MutableLiveData<Boolean>()
-    val estaCargando: LiveData<Boolean> get() = _estaCargando
+    private val _juegoEstaCargando = MutableLiveData<Boolean>()
+    val juegoEstaCargando: LiveData<Boolean> get() = _juegoEstaCargando
+
+    private val _juegosCargando = MutableLiveData<Boolean>()
+    val juegosCargando: LiveData<Boolean> get() = _juegosCargando
 
     private val _mensajeEstado = MutableLiveData<String>()
     val mensajeEstado: LiveData<String> get() = _mensajeEstado
+
+    //progressbar
+    private val _progreso = MutableLiveData<Int>()
+    val progreso: LiveData<Int> = _progreso
 
     fun obtenerVideojuegos() {
         _games.value = emptyList<Videogame>()
@@ -35,10 +47,31 @@ class TaskViewModel: ViewModel() {
 
     fun obtenerJuegoAleatorio(){
         viewModelScope.launch {
-            _estaCargando.value = true
+            _juegoEstaCargando.value = true
             _mensajeEstado.value = "Conectando..."
+            _progreso.value = 0
 
-            val resultado = repositorio.getRandomGame()
+            // Corrutina que simula el progreso
+            val jobProgreso = launch {
+                var progresoActual = 0
+
+                while (progresoActual < 100 && isActive) {
+                    delay(50)
+                    progresoActual++
+                    _progreso.value = progresoActual
+                }
+            }
+
+            // Corrutina que obtiene el juego
+            val resultadoDeferred = async {
+                repositorio.getRandomGame()
+            }
+
+            val resultado = resultadoDeferred.await()
+
+            jobProgreso.cancel()
+
+            _progreso.value = 100
 
             resultado.onSuccess { juego ->
                 _mensajeEstado.value = "Juego obtenido correctamente"
@@ -47,14 +80,14 @@ class TaskViewModel: ViewModel() {
             }.onFailure {
                 _mensajeEstado.value = "Error: ${it.message}"
             }
-            _estaCargando.value = false
+            _juegoEstaCargando.value = false
 
         }
     }
 
     fun obtenerTresAleatorios(){
         viewModelScope.launch {
-            _estaCargando.value = true
+            _juegosCargando.value = true
             _mensajeEstado.value = "Obteniendo tres juegos"
 
             try {
@@ -74,11 +107,15 @@ class TaskViewModel: ViewModel() {
                 _mensajeEstado.value = "Servidor muy lento. Inténtalo nuevamente"
                 throw e
             } finally {
-                _estaCargando.value = false
+                _juegosCargando.value = false
             }
 
 
         }
+    }
+
+    fun borrarListaJuegos(){
+        _games.value = emptyList<Videogame>()
     }
 }
 
