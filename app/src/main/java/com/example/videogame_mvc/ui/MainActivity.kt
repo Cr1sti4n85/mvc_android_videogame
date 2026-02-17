@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.toColorInt
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.videogame_mvc.databinding.ActivityMainBinding
@@ -155,6 +156,10 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.progreso.observe(this) { progreso ->
             binding.progressBarHorizontal.progress = progreso
+        }
+
+        viewModel.textColor.observe(this) { color ->
+            binding.tvEstado.setTextColor(color.toColorInt())
         }
 
     }

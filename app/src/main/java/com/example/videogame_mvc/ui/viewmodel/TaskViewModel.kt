@@ -41,6 +41,10 @@ class TaskViewModel: ViewModel() {
     private val _progreso = MutableLiveData<Int>()
     val progreso: LiveData<Int> = _progreso
 
+    private val _textColor = MutableLiveData<String>()
+
+    val textColor: LiveData<String> = _textColor
+
     fun obtenerVideojuegos() {
         _games.value = emptyList<Videogame>()
     }
@@ -62,7 +66,7 @@ class TaskViewModel: ViewModel() {
                 }
             }
 
-            // Corrutina que obtiene el juego
+             //Corrutina que obtiene el juego
             val resultadoDeferred = async {
                 repositorio.getRandomGame()
             }
@@ -79,6 +83,7 @@ class TaskViewModel: ViewModel() {
 
             }.onFailure {
                 _mensajeEstado.value = "Error: ${it.message}"
+                _textColor.value = "#FF0000"
             }
             _juegoEstaCargando.value = false
 
@@ -105,6 +110,7 @@ class TaskViewModel: ViewModel() {
             } catch (e: TimeoutCancellationException) {
 
                 _mensajeEstado.value = "Servidor muy lento. Inténtalo nuevamente"
+                _textColor.value = "#FF0000"
                 throw e
             } finally {
                 _juegosCargando.value = false
